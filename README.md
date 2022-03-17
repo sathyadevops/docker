@@ -22,3 +22,5 @@ services:
     environment:
       MYSQL_DATABASE: wordpress
       MYSQL_ROOT_PASSWORD: "12345"
+
+
