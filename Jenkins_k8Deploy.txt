@@ -1,0 +1,24 @@
+#pipeline syntax
+#git: Git
+#withCredentials: Bind credentials to variables.
+
+node{
+    stage("git clone"){
+        
+       git credentialsId: 'GIT_CREDS', url: 'https://github.com/sathyadevops/mvnproj.git'
+    }
+    stage("clean comple"){
+        def mavenHome = tool name: "maven", type: "maven"
+        def mavenCMD = "${mavenHome}/bin/mvn"
+        sh "${mavenCMD} clean compile test package" 
+    }
+    stage("docker build"){
+        sh "docker build -t sathyadevops/jenkins_k8image ."
+    }
+    stage("docker push"){
+        withCredentials([string(credentialsId: 'DOCKER_HUB_CREDS', variable: 'DOCKER_HUB_CREDS')]) {
+           sh "docker login -u sathyadevops -p ${DOCKER_HUB_CREDS}"
+        }
+        sh "docker push sathyadevops/jenkins_k8image"
+    }
+}
